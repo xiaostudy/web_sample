@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/jquery-3.3.1.js"></script>
+    <script src="../js/layer/layer.js"></script>
+
+    <script type="text/javascript">
+        function msg1() {
+            layer.msg("msg弹窗,默认停留3秒");
+        }
+
+        function msg2() {
+            layer.msg("msg弹窗,停留2秒", {time: 2000});
+        }
+
+        function msg3() {
+            layer.msg("msg弹窗,不关闭", {time: -1});
+        }
+
+        function msg4() {
+            layer.msg("msg弹窗,图标", {icon: 6, time: 2000});//1打钩,2打叉,3问号,4锁定,5难过脸,6微笑脸,7-15感叹号,16加载,17以上估计全是感叹号
+        }
+
+        function msg5() {
+            layer.msg("msg弹窗,起始位置", {offset:['50px', '50px'],time: 2000});//x纵向,y横向
+        }
+
+        function msg6() {
+            layer.msg("msg弹窗, 更改背景,背景不可点击", {time: 2000, shade : [0.5 , '#000' , true]});
+        }
+
+        function msg7() {
+            layer.msg("msg弹窗, 回调函数", {time: 2000,},function(){
+                reload();
+            });
+        }
+
+        function reload() {//回调函数
+            layer.msg("回调函数执行！");
+        }
+
+        function load1() {
+            var index = layer.load();
+            layer.close(index);//不加关闭一直处于加载状态
+        }
+
+        function load2() {
+            var index = layer.load(1);
+            layer.close(index);//不加关闭一直处于加载状态
+        }
+
+        function load3() {
+            layer.load(2,{time: 2*1000});
+        }
+        
+        function tips1() {
+            layer.tips('只想提示地精准些', '#tips1');
+        }
+
+        function tips2() {
+            layer.tips('在上面', '#tips2', {
+                tips: 1//1在上面，2在右边，3在下面，4在左边
+            });
+        }
+
+        function open1(){
+            var index = layer.open({
+                // time: 2*1000,//2秒后不点击关闭也自动关闭
+                type: 1,//0：信息框，默认 1：页面层 2：iframe层 3：加载层 4：tips层
+                area: ['600px', '360px'],//固定长宽
+                shadeClose: false, //点击遮罩关闭
+                content: '\<\div style="padding:20px;">open弹窗\<\/div>'
+                // content: 'open弹窗'
+            });
+            // layer.close(index);//不加关闭一直处于等待点击关闭
+        }
+
+        function open2(){
+            layer.open({
+                title:'test',
+                type: 1,
+                area: ['600px', '360px'],//固定长宽
+                /*https://www.layui.com/doc/modules/layer.html#btn*/
+                btn:['确定', '取消'],//第一个按钮是yes，第二个按钮是btn2，以此类推
+                style:'color:#666;',
+                content: '\<\div style="padding:20px;">跳转到layer.msg\<\/div>',
+                yes: function(index, layero){//第一个按钮
+                    location.href='https://www.layui.com/doc/modules/layer.html#layer.msg';
+                },
+                btn2: function (index, layero) {//第二个按钮
+                    layer.msg("点击取消关闭");
+                    // return false; //开启该代码可禁止点击该按钮关闭
+                },
+                cancel: function(){//右上角关闭回调
+                    layer.msg("点击右上角关闭");
+                    // return false;//开启该代码可禁止点击该按钮关闭
+                }
+            });
+        }
+    </script>
+</head>
+<body style="text-align: center">
+    <h1>layer演示</h1>
+    <div>
+        <div>
+            <h2>提示框msg</h2>
+            <a href="https://www.layui.com/doc/modules/layer.html#layer.msg">msg的官方讲解</a>
+            <br><br>
+            <div>
+                <input type="button" value="msg弹窗,默认停留3秒" onclick="msg1()" />
+            </div>
+            <div>
+                <input type="button" value="msg弹窗,停留2秒" onclick="msg2()" />
+            </div>
+            <div>
+                <input type="button" value="msg弹窗,不关闭" onclick="msg3()" />
+            </div>
+            <div>
+                <input type="button" value="msg弹窗,图标" onclick="msg4()" />
+            </div>
+            <div>
+                <input type="button" value="msg弹窗,起始位置" onclick="msg5()" />
+            </div>
+            <div>
+                <input type="button" value="msg弹窗,更改背景后,背景不可点击" onclick="msg6()" />
+            </div>
+            <div>
+                <input type="button" value="msg弹窗,回调函数" onclick="msg7()" />
+            </div>
+        </div>
+        <hr>
+        <div>
+            <h2>加载层load</h2>
+            <a href="https://www.layui.com/doc/modules/layer.html#layer.load">load的官方讲解</a>
+            <br><br>
+            <div>
+                <input type="button" value="load弹窗,默认" onclick="load1()" />
+            </div>
+            <div>
+                <input type="button" value="load弹窗,1" onclick="load2()" />
+            </div>
+            <div>
+                <input type="button" value="load弹窗,指定等待2秒" onclick="load3()" />
+            </div>
+        </div>
+        <hr>
+        <div>
+            <h2>tips</h2>
+            <a href="https://www.layui.com/doc/modules/layer.html#layer.tips">tips的官方讲解</a>
+            <br><br>
+            <div>
+                <input type="button" value="tips弹窗,在下面测试旁边" onclick="tips1()" />
+            </div>
+            <span id="tips1">
+                测试
+            </span>
+            <div>
+                <input type="button" value="tips弹窗,在上面" onclick="tips2()" />
+            </div>
+            <span id="tips2">
+                测试
+            </span>
+        </div>
+        <hr>
+        <div>
+            <h2>open</h2>
+            <a href="https://www.layui.com/doc/modules/layer.html#layer.open">open的官方讲解</a>
+            <br><br>
+            <div>
+                <input type="button" value="open弹窗" onclick="open1()" />
+            </div>
+            <div>
+                <input type="button" value="open弹窗,2" onclick="open2()" />
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <!--jqueryui-->
+    <link href="../css/jquery-ui.min.css" rel="stylesheet">
+    <!--jqgrid的css-->
+    <link href="../css/ui.jqgrid.css" rel="stylesheet">
+    <!--jquery-->
+    <script src="../js/jquery-3.0.0.min.js"></script>
+    <!--<script src="//cdn.bootcss.com/jquery/3.0.0-beta1/jquery.min.js"></script>-->
+    <!--locale-->
+    <script src="../js/i18n/grid.locale-en.js"></script>
+    <!--jqgrid的js-->
+    <script src="../js/jquery.jqGrid.min.js"></script>
+    <script src="../js/layer/layer.js"></script>
+
+    <meta charset="utf-8" />
+    <title>jqGrid Loading Data</title>
+
+</head>
+<body>
+<table id="jqGrid"></table>
+<div id="jqGridPager"></div>
+<script language="JavaScript">
+    $(function(){
+        $("#jqGrid").jqGrid({
+            url: "../json/test.json",
+            datatype:'json',
+            colModel:[
+                {label: "ID", name:"id",index:"id", width: 20},
+                {label: "名称", name:"name",index:"name", width: 40},
+                {label: "年龄", name:"age",index:"age", width: 40}
+            ],
+            viewrecords:true,//是否显示所有记录的总数
+            height: $(window).height() - 240,//定高度
+            // height: "auto",//自动高度，随行数变
+            rowNum:50,//当前显示行数
+            rowList:[2,4,5,6,8,10,12,15,25,30],//可选的行数
+            rownumbers: true,//显示行序列
+            rownumWidth: 25,//如果rownumbers为true，则可以设置column的宽度
+            // width: 500,//定宽度
+            autowidth: true,//自动宽度
+            pager:"#jqGridPager",//定义翻页用的导航栏，必须是有效的html元素，例如id为jqGridPager
+            jsonReader: {//来跟服务器端返回的数据做对应
+                root: "records",//包含实际数据的数组
+                page: "current",//当前页
+                total: "pages",//总页数
+                records: "total"//查询出的记录数
+            },
+            prmNames: {//发送数据到服务器，当参数为null时不会被发到服务器端
+                page: "page",
+                rows: "rows",
+                order: "order"
+            },
+            beforeRequest: function() {//请求前触发的事件
+                console.log("1——beforeRequest");
+            },
+            onPaging: function(pgButton) {//点击翻页按钮或点击换行数时触发此事件，也就是重新请求，参数pgButton为翻页，长度为总页数。初次加载时不执行，事件最后执行
+                console.log("onPaging");
+            },
+            gridComplete: function () {//跟onPaging的事件一样，只是这个触发时最后执行。初次加载时也执行，两者事件不冲突
+                layer.msg("点击翻页按钮或点击换行数时触发此事件");
+                console.log("2——gridComplete");
+            },
+            loadComplete: function (xhr) {//当从服务器返回响应时执行，xhr：XMLHttpRequest 对象
+                console.log("3——loadComplete");
+            },
+            onCellSelect: function (rowid,iCol,cellcontent,e) {//当点击单元格时触发。rowid：当前行id；iCol：当前单元格索引；cellContent：当前单元格内容；e：event对象
+                console.log("onCellSelect——rowid:" + rowid);
+                console.log("onCellSelect——iCol:" + iCol);
+                console.log("onCellSelect——cellcontent:" + cellcontent);
+                console.log("onCellSelect——e:" + e);
+            },
+            ondblClickRow: function (rowid,iRow,iCol,e) {//双击行时触发。rowid：当前行id；iRow：当前行索引位置；iCol：当前单元格位置索引；e:event对象
+                console.log("ondblClickRow——rowid:" + rowid);
+                console.log("ondblClickRow——iRow:" + iRow);
+                console.log("ondblClickRow——iCol:" + iCol);
+                console.log("ondblClickRow——e:" + e);
+            }//和鼠标右键事件onRightClickRow一样参数
+        });
+    });
+</script>
+
+</body>
+</html>

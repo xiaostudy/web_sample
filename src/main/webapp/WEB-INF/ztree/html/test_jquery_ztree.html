@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../css/demo.css" type="text/css">
+    <link rel="stylesheet" href="../css/zTreeStyle/zTreeStyle.css" type="text/css">
+    <script src="../js/jquery-3.3.1.js"></script>
+    <script src="../js/zTree/jquery.ztree.all.js"></script>
+    <script src="../js/zTree/jquery.ztree.exhide.js"></script>
+    <script src="../../js/layer/layer.js"></script>
+
+    <script type="text/javascript">
+        // 页面加载后初始化zTree数据且默认展开所有节点
+        $(document).ready(function () {
+            $.fn.zTree.init($("#treeDemo"), setting, zNodes).expandAll(true);//第一个参数 tree存在位置，第二个参数 设置，第三个参数 数据
+            //.expandAll(true)表示展开全部节点，如果为false表示折叠全部节点
+        });
+
+        //设置
+        var setting = {
+            check: {//复选框设置
+                enable: true,//显示复选框
+                chkStyle: "checkbox",//勾选框类型(checkbox 或 radio），默认checkbox，[setting.check.enable = true 时生效],
+                // Y 属性定义 checkbox 被勾选后的情况； N 属性定义 checkbox 取消勾选后的情况； "p" 表示操作会影响父级节点； "s" 表示操作会影响子级节点。
+                chkboxType: { "Y": "s", "N": "s" },//勾选 checkbox 对于父子节点的关联关系，默认值：{ "Y": "ps", "N": "ps" }。[setting.check.enable = true 且 setting.check.chkStyle = "checkbox" 时生效]
+                nocheckInherit: false//当父节点设置 nocheck = true 时，设置子节点是否自动继承 nocheck = true 。[setting.check.enable = true 时生效]
+            },
+            data: {//数据设置
+                simpleData: {//说明：其中的id不是html上的id，是节点上的id，html上看不到的
+                    enable: true,//默认值：false，确定 zTree 初始化时的节点数据、异步加载时的节点数据、或 addNodes 方法中输入的 newNodes 数据是否采用简单数据模式 (Array),不需要用户再把数据库中取出的 List 强行转换为复杂的 JSON 嵌套格式
+                    rootPId: -1,//根节点的父节点id值，默认值：null，用于修正根节点父节点数据，即 pIdKey 指定的属性值。[setting.data.simpleData.enable = true 时生效]
+                    idKey: "id",//当前节点id名称，默认值："id"，节点数据中保存唯一标识的属性名称。[setting.data.simpleData.enable = true 时生效]
+                    pIdKey: "parentId"//当前节点的父节点id名称，默认值："pId"，节点数据中保存其父节点唯一标识的属性名称。[setting.data.simpleData.enable = true 时生效]
+                }
+            },
+            callback : {//事件设置
+                onClick : zTreeOnClick,// 树的点击事件
+                onCheck : zTreeOnCheck,// 点击复选框事件
+                // onAsyncSuccess : ztreeOnAsyncSuccess,// 异步加载成功后执行的方法
+            }
+        };
+
+        //ztree用于初始化的静态数据
+        var zNodes = [
+            { id: 1, parentId: 0, name: "随意勾选 1", nocheck: true },//id[setting.data.idKey]当前节点唯一标识，parentId[setting.data.pIdKey]当前节点的父节点唯一标识
+            { id: 2, parentId: 0, name: "随意勾选 2", nocheck: true },
+            { id: 11, parentId: 1, name: "随意勾选 1-1", nocheck: true },// name节点显示名称
+            { id: 111, parentId: 11, name: "无 checkbox 1-1-1", nocheck: true },// nocheck: true表示不显示复选框
+            { id: 112, parentId: 11, name: "随意勾选 1-1-2", nocheck: true },
+            { id: 12, parentId: 1, name: "无 checkbox 1-2", nocheck: true },
+        ];
+
+        //过滤节点的机制 直接return node表示不做任何过滤
+        function filter(node) {
+            return node;
+        }
+
+        ///动态设置zTree的所有节点有checkbox
+        function DynamicUpdateNodeCheck() {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+            //根据过滤机制获得zTree的所有节点
+            var nodes = zTree.getNodesByFilter(filter);
+            //遍历每一个节点然后动态更新nocheck属性值
+            for (var i = 0; i < nodes.length; i++) {
+                var node = nodes[i];
+                node.nocheck = false; //表示显示checkbox
+                zTree.updateNode(node);
+            }
+            layer.msg("设置zTree的所有节点有checkbox", {time: 2000});
+        }
+
+        ///动态设置zTree的所有节点无checkbox
+        function DynamicUpdateNoNodeCheck() {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+            //根据过滤机制获得zTree的所有节点
+            var nodes = zTree.getNodesByFilter(filter);
+            //遍历每一个节点然后动态更新nocheck属性值
+            for (var i = 0; i < nodes.length; i++) {
+                var node = nodes[i];
+                node.nocheck = true; //表示不显示checkbox
+                zTree.updateNode(node);
+            }
+            layer.msg("设置zTree的所有节点无checkbox");
+        }
+
+        //动态设置隐藏zTree所有节点
+        function hiddenNodes() {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+            //根据过滤机制获得zTree的所有节点
+            var nodes = zTree.getNodesByFilter(filter);
+            //隐藏节点
+            zTree.hideNodes(nodes);
+            layer.msg("设置隐藏zTree所有节点", {time: 2000});
+        }
+
+        //动态设置显示zTree所有节点
+        function showNodes() {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+            //根据过滤机制获得zTree的所有节点
+            var nodes = zTree.getNodesByFilter(filter);
+            //显示节点
+            zTree.showNodes(nodes);
+            layer.msg("设置显示zTree所有节点", {time: 2000});
+        }
+
+        //点击事件
+        function zTreeOnClick(event, treeId, treeNode) {
+            console.log("点击事件>>>>>开始");
+            var id = treeNode.id;
+            var parentId = treeNode.parentId;
+            var childrenList = treeNode.children;
+            console.log("id:" + id);
+            console.log("parentId:" + parentId);
+            console.log("childrenList:" + childrenList);
+            if(undefined == childrenList) {
+                console.log("是否是父节点:" + false);
+            } else {
+                console.log("是否是父节点:" + true);
+            }
+            console.log("点击事件<<<<<结束");
+            layer.msg("点击事件", {time: 2000});
+        }
+
+        //点击复选框事件
+        function zTreeOnCheck(event, treeId, treeNode) {
+            console.log("点击复选框事件>>>>>开始");
+            var id = treeNode.id;
+            var parentId = treeNode.parentId;
+            var childrenList = treeNode.children;
+            console.log("id:" + id);
+            console.log("parentId:" + parentId);
+            console.log("childrenList:" + childrenList);
+            if(undefined == childrenList) {
+                console.log("是否是父节点:" + false);
+            } else {
+                console.log("是否是父节点:" + true);
+            }
+            console.log("点击复选框事件<<<<<结束");
+            layer.msg("点击复选框事件", {time: 2000});
+        }
+
+        // 获取树成功后进行的回调操作
+        /*function ztreeOnAsyncSuccess(event, treeId, treeNode) {
+            console.log("回调操作");
+        }*/
+
+    </script>
+</head>
+<body>
+<h1>
+    Checkbox nocheck 演示</h1>
+<div class="content_wrap">
+    <div class="zTreeDemoBackground left">
+        <ul id="treeDemo" class="ztree"></ul>
+    </div>
+    <div class="right">
+        <p>
+            默认情况下设置任何节点无checkbox选择框，需要配置每一个节点的nocheck属性为true即可。</p>
+        <p>
+            zTree加载完成后通过updateNode(node)方法动态更新节点的nocheck属性为false，则节点将会显示checkbox。</p>
+        <h3>
+            STEP DAY</h3>
+        <div>
+            <input type="button" value="动态设置节点有checkbox" onclick="DynamicUpdateNodeCheck()" />
+        </div>
+        <div>
+            <input type="button" value="动态设置节点无checkbox" onclick="DynamicUpdateNoNodeCheck()" />
+        </div>
+        <div>
+            <input type="button" value="隐藏全部节点" onclick="hiddenNodes()" />
+        </div>
+        <div>
+            <input type="button" value="显示全部节点" onclick="showNodes()" />
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
